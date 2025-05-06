@@ -2,14 +2,13 @@
 
 This project estimates the **population coverage of two radio broadcast polygons** (`Arewa` and `Freedom`) within Nigerian state boundaries using a gridded population raster. It also estimates the number of **women of reproductive age (WRA) with radio access** in the covered areas.
 
----
+------------------------------------------------------------------------
 
 Last updated: May 2025
 
 Script created for internal analysis at Family Empowerment Media.
 
-For questions or modifications, contact: Kaitlyn Hobbs at [khobbs@familyempowermentmedia.org](mailto:khobbs@familyempowermentmedia.org).
----
+For questions or modifications, contact: Kaitlyn Hobbs at [khobbs\@familyempowermentmedia.org](mailto:khobbs@familyempowermentmedia.org).
 
 ## Data Sources
 
