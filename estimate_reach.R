@@ -14,6 +14,10 @@ options(warn = -1)  # Suppress warnings
 # Set projection
 proj <- "+proj=sinu +lat_0=0 +lon_0=25 +lat_1=20 +lat_2=-23 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs +type=crs"
 
+# Initialize variables
+proportion_wra = 0.225 # Proportion of women of reproductive age in *region*
+proportion_radio_owners = 0.437 # DHS/MIS *national* prop. of households that own a radio
+
 #--------------
 # Read data
 #--------------
@@ -97,19 +101,18 @@ for (i in seq_len(nrow(arewa_states))) {
 #-------------------
 # Summarize ----
 #-------------------
-proportion_wra = 0.225
-proportion_radio_owners = 0.437
-
 # calculate the number of women of reproductive age (WRA)
 population_data <- population_data %>%
   mutate(
-    wra = state_population * proportion_wra * proportion_radio_owners
+    wra = state_population * proportion_wra,
+    wra_radio_owners = state_population * proportion_wra * proportion_radio_owners
   ) 
 
 # summarise to show total population overall
 population_data %>%
   summarise(
-    wra = sum(wra)
+    wra = sum(wra),
+    wra_radio_owners = sum(wra_radio_owners)
   )
 
 #-------------------
@@ -169,19 +172,18 @@ for (i in seq_len(nrow(freedom_states))) {
 ###############
 # Summarize ----
 ###############
-proportion_wra = 0.225
-proportion_radio_owners = 0.437
-
 # calculate the number of women of reproductive age (WRA)
 population_data <- population_data %>%
   mutate(
-    wra = state_population * proportion_wra * proportion_radio_owners
+    wra = state_population * proportion_wra,
+    wra_radio_owners = state_population * proportion_wra * proportion_radio_owners
   ) 
 
 # summarise to show total population overall
 population_data %>%
   summarise(
-    wra = sum(wra)
+    wra = sum(wra),
+    wra_radio_owners = sum(wra_radio_owners)
   )
 
 ###############
