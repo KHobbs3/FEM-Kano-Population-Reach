@@ -21,7 +21,8 @@ For questions or modifications, contact: Kaitlyn Hobbs at [khobbs\@familyempower
 Each output CSV contains:
 
 -   source_file: Either arewa_polygon or freedom_polygon.
--   state_population: Total population in the polygon portion intersecting the state.
+-   state_population: Total population of the state, estimated from the population grid.
+-   state_radio_population: Total population in the polygon portion intersecting the state.
 -   population_coverage: Proportion of state population reached by the broadcast.
 -   state: State name (ADM1_EN).
 -   wra: Estimated number of WRA with radio access in that state's covered area.
