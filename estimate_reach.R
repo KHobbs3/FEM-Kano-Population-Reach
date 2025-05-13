@@ -35,8 +35,6 @@ gpkg_files <- list.files(path = filepath, pattern = "\\.gpkg$", full.names = TRU
 
 # Read Nigeria boundaries ----
 boundaries <- st_read("boundaries/nga_admbnda_adm1_osgof_20190417.shp")
-# boundaries <- st_transform(boundaries, crs=proj)
-# using popgrid inherent projection --- delete if transforming
 boundaries <- st_transform(boundaries, crs=crs(population_raster))
 
 # Read Kano stations ----
