@@ -18,6 +18,15 @@ proj <- "+proj=sinu +lat_0=0 +lon_0=25 +lat_1=20 +lat_2=-23 +x_0=0 +y_0=0 +datum
 proportion_wra = 0.225 # Proportion of women of reproductive age in *region*
 proportion_radio_owners = 0.437 # DHS/MIS *national* prop. of households that own a radio
 
+
+# Set-up function for calculating population coverage
+pop_coverage <- function (population_raster, polygon){
+  exactextractr::exact_extract(population_raster, polygon,
+                               fun = function(values, coverage_fractions) {
+                                 sum(values * coverage_fractions, na.rm = TRUE)
+                               })
+}
+
 #--------------
 # Read data
 #--------------
@@ -72,19 +81,13 @@ for (i in seq_len(nrow(arewa_states))) {
   state_geom <- boundaries %>% filter(ADM1_EN == state_name)
   
   # Get total population in state
-  total_pop <- exactextractr::exact_extract(population_raster, state_geom,
-                                            fun = function(values, coverage_fractions) {
-                                              sum(values * coverage_fractions, na.rm = TRUE)
-                                            })
+  total_pop <- pop_coverage(population_raster, state_geom)
   
   # Intersect Arewa polygon with the state
   arewa_in_state <- st_intersection(state_geom, arewa_polygon)
   
   # Crop population raster to Arewa-in-state area
-  pop_arewa <- exactextractr::exact_extract(population_raster, arewa_in_state,
-                                            fun = function(values, coverage_fractions) {
-                                              sum(values * coverage_fractions, na.rm = TRUE)
-                                            })
+  pop_arewa <- pop_coverage(population_raster, arewa_in_state)
   
   # Calculate coverage
   coverage <- pop_arewa / total_pop
@@ -143,19 +146,13 @@ for (i in seq_len(nrow(freedom_states))) {
   state_geom <- boundaries %>% filter(ADM1_EN == state_name)
   
   # Get total population in state
-  total_pop <- exactextractr::exact_extract(population_raster, state_geom,
-                                            fun = function(values, coverage_fractions) {
-                                              sum(values * coverage_fractions, na.rm = TRUE)
-                                            })
+  total_pop <- pop_coverage(population_raster, state_geom)
   
   # Intersect Freedom polygon with the state
   freedom_in_state <- st_intersection(state_geom, freedom_polygon)
   
   # Crop population raster to Freedom-in-state area
-  pop_freedom <- exactextractr::exact_extract(population_raster, freedom_in_state,
-                                            fun = function(values, coverage_fractions) {
-                                              sum(values * coverage_fractions, na.rm = TRUE)
-                                            })
+  pop_freedom <- pop_coverage(population_raster, freedom_in_state)
   
   # Calculate coverage
   coverage <- pop_freedom / total_pop
@@ -197,5 +194,13 @@ write.csv(population_data, file = "output/freedom_population.csv")
 ###############
 library(mapview)
 # mapview(hf_buffer, col.regions = "blue") +
-  mapview(freedom_states, col.regions = "red") +
+    mapview(freedom_in_state, col.regions = 'blue') +
+      mapview(freedom_states, col.regions = "red") +
     mapview(boundaries, col.regions = "green")
+    
+    
+    
+# Nigeria population
+national_bounds <- boundaries %>% st_union()
+
+national_pop <- pop_coverage(population_raster, national_bounds)
