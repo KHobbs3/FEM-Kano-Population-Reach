@@ -27,8 +27,14 @@ pop_coverage <- function (population_raster, polygon){
 # Read data
 #--------------
 # Read population raster and reproject it ----
+proj <- "epsg:32632"
+
+
 print("Reading population raster...")
 population_raster <- raster(list.files(here("population"), full.names = T, pattern = "*.tif$")[1])
+
+# Reproject to Equal Area projection for Nigeria
+population_raster <- projectRaster(population_raster, crs = proj)
 
 filepath = 'cloudrf/fem_kano/'
 gpkg_files <- list.files(path = filepath, pattern = "\\.gpkg$", full.names = TRUE, recursive = F)
@@ -180,6 +186,7 @@ population_data <- population_data %>%
 # summarise to show total population overall
 population_data %>%
   summarise(
+    state_radio_population = sum(state_radio_population),
     wra = sum(wra),
     wra_radio_owners = sum(wra_radio_owners)
   )
