@@ -27,13 +27,21 @@ pop_coverage <- function (population_raster, polygon){
 # Read data
 #--------------
 # Read population raster and reproject it ----
-proj <- "epsg:32632"
-
+# proj <- "ESRI:1178" # for Nigeria - not recognized in R
+# CUSTOM Nigeria Proj
+# proj <- "+proj=aea +lat_1=4 +lat_2=14 +lat_0=0 +lon_0=8 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
+proj <- "ESRI:102022" # equal area albers for Africa
 
 print("Reading population raster...")
 population_raster <- raster(list.files(here("population"), full.names = T, pattern = "*.tif$")[1])
 
-# Reproject to Equal Area projection for Nigeria
+# First, override/correct the projection of popgrid to match its inherent proj of WGS 
+# it is read in as a deprecated BC CRS 9122
+# Cite: https://hub.worldpop.org/geodata/summary?id=52303
+# WGS projection for Nigeria: https://epsg.io/4263 
+crs(population_raster) <- "EPSG:4263" # overriding does not involve resampling, unlike transforming
+
+# Reproject to Albers equal area proj for Africa
 population_raster <- projectRaster(population_raster, crs = proj)
 
 filepath = 'cloudrf/fem_kano/'
@@ -200,7 +208,6 @@ write.csv(population_data, file = "output/freedom_population.csv")
 ###############
 # Visualize ----
 ###############
-library(mapview)
   mapview(freedom_in_state, col.regions = 'blue') +
     mapview(freedom_states, col.regions = "red") +
       mapview(boundaries, col.regions = "green")
