@@ -7,6 +7,7 @@ library(openxlsx)
 library(stringr)
 library(raster)
 
+# UNCONSTRAINED ----
 # Set-up ----
 options(warn = -1)  # Suppress warnings
 
@@ -27,10 +28,8 @@ pop_coverage <- function (population_raster, polygon){
 # Read data
 #--------------
 # Read population raster and reproject it ----
-# proj <- "ESRI:1178" # for Nigeria - not recognized in R
-# CUSTOM Nigeria Proj
-# proj <- "+proj=aea +lat_1=4 +lat_2=14 +lat_0=0 +lon_0=8 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
-proj <- "ESRI:102022" # equal area albers for Africa
+# Equal area projection Nigeria and countries in same longitudinal range
+proj <- "epsg:32632"
 
 print("Reading population raster...")
 population_raster <- raster(list.files(here("population"), full.names = T, pattern = "*.tif$")[1])
@@ -39,10 +38,11 @@ population_raster <- raster(list.files(here("population"), full.names = T, patte
 # it is read in as a deprecated BC CRS 9122
 # Cite: https://hub.worldpop.org/geodata/summary?id=52303
 # WGS projection for Nigeria: https://epsg.io/4263 
-crs(population_raster) <- "EPSG:4263" # overriding does not involve resampling, unlike transforming
+crs(population_raster) <- CRS("+init=EPSG:4263") # overriding does not involve resampling, unlike transforming
 
 # Reproject to Albers equal area proj for Africa
 population_raster <- projectRaster(population_raster, crs = proj)
+print(crs(population_raster))
 
 filepath = 'cloudrf/fem_kano/'
 gpkg_files <- list.files(path = filepath, pattern = "\\.gpkg$", full.names = TRUE, recursive = F)
