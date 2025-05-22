@@ -28,21 +28,8 @@ pop_coverage <- function (population_raster, polygon){
 # Read data
 #--------------
 # Read population raster and reproject it ----
-# Equal area projection Nigeria and countries in same longitudinal range
-proj <- "epsg:32632"
-
 print("Reading population raster...")
 population_raster <- raster(list.files(here("population"), full.names = T, pattern = "*.tif$")[1])
-
-# First, override/correct the projection of popgrid to match its inherent proj of WGS 
-# it is read in as a deprecated BC CRS 9122
-# Cite: https://hub.worldpop.org/geodata/summary?id=52303
-# WGS projection for Nigeria: https://epsg.io/4263 
-crs(population_raster) <- CRS("+init=EPSG:4263") # overriding does not involve resampling, unlike transforming
-
-# Reproject to Albers equal area proj for Africa
-population_raster <- projectRaster(population_raster, crs = proj)
-print(crs(population_raster))
 
 filepath = 'cloudrf/fem_kano/'
 gpkg_files <- list.files(path = filepath, pattern = "\\.gpkg$", full.names = TRUE, recursive = F)
@@ -50,6 +37,10 @@ gpkg_files <- list.files(path = filepath, pattern = "\\.gpkg$", full.names = TRU
 # Read Nigeria boundaries ----
 boundaries <- st_read("boundaries/nga_admbnda_adm1_osgof_20190417.shp")
 boundaries <- st_transform(boundaries, crs=crs(population_raster))
+
+# National population ----
+national <- pop_coverage(population_raster, boundaries %>% st_union())
+print(national)
 
 # Read Kano stations ----
 arewa <- gpkg_files[9]
@@ -208,6 +199,6 @@ write.csv(population_data, file = "output/freedom_population.csv")
 ###############
 # Visualize ----
 ###############
-  mapview(freedom_in_state, col.regions = 'blue') +
-    mapview(freedom_states, col.regions = "red") +
+  mapview(arewa_in_state, col.regions = 'blue') +
+    mapview(arewa_states, col.regions = "red") +
       mapview(boundaries, col.regions = "green")
